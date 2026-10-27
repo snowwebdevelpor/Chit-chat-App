@@ -29,6 +29,12 @@ nav{display:flex;margin:8px 12px calc(10px + env(safe-area-inset-bottom));paddin
 .emo{display:flex;flex-wrap:wrap;gap:2px;padding:8px;margin:0 10px 6px}.emo span{font-size:26px;padding:4px;cursor:pointer}
 .err{color:#b3264e;font-size:14px;margin:6px 0;min-height:18px}.ok{color:#2c7a55}
 .q{font-size:12px;opacity:.8;border-left:3px solid var(--a2);padding-left:6px;margin-bottom:4px}.b button{padding:8px 12px;min-height:36px}.bar button{padding:10px 11px}.bar input{flex:1;min-width:0}.top{display:flex;align-items:center;gap:10px;padding:8px 12px}
+[hidden]{display:none!important}.b{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.bar{gap:4px;padding:6px;border-radius:30px;margin:0 10px calc(10px + env(safe-area-inset-bottom))}.bar input{border:0;background:transparent;margin:0;padding:10px 8px;box-shadow:none!important}
+.bar .rb{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;font-size:19px;flex:none}.bar .ic{background:none;box-shadow:none;color:inherit;width:40px;min-height:40px;padding:0;font-size:22px;flex:none}.bar .snd{padding:8px 16px;min-height:40px;font-weight:700;border-radius:22px;flex:none}
+.bar{gap:0;padding:6px 6px}.bar .ic{color:var(--ic);width:38px;height:42px;padding:0;flex:none}.ic svg{width:27px;height:27px;fill:currentColor;display:block;margin:auto}
+.ib{flex:1;min-width:0;display:flex;align-items:center;background:rgba(255,255,255,.75);border:1px solid var(--bd);border-radius:22px;margin:0 4px}.ib input{padding:11px 8px 11px 14px}.ib .ic{width:36px;height:38px}.ib .ic svg{width:24px;height:24px}
+.rec{color:#e5384f!important;animation:rp 1s infinite}@keyframes rp{50%{opacity:.35}}:root{--ic:#f0649b}
 </style></head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -120,7 +126,7 @@ else if(m.kind==="image")inner=`<button class="s" data-i="${esc(m.media_path)}">
 else if(m.kind==="view_once")inner=m.viewed_at?`<i>🔥 Photo opened</i>`:mine?`<i>🔥 View-once photo sent</i>`:`<button class="s" data-o="${m.id}">🔥 View once photo</button>`;
 else inner=esc(m.body);
 const q=m.reply_to&&cur.find(x=>x.id===m.reply_to);
-return`<div class="b ${mine?"me":""}" data-id="${m.id}">${q?`<div class="q">${esc(qText(q))}</div>`:""}${inner}<small>${time(m.created_at)}${mine?(m.read_at?" · Read":" · Sent"):""} <span data-r="${m.id}" style="cursor:pointer">↩</span></small></div>`}
+return`<div class="b ${mine?"me":""}" data-id="${m.id}">${q?`<div class="q">${esc(qText(q))}</div>`:""}${inner}<small>${time(m.created_at)}${mine?(m.read_at?" · Read":" · Sent"):""}</small></div>`}
 function addBubble(m){cur.push(m);const l=$("#ml");if(!l)return;const p=l.querySelector("p");if(p)p.remove();l.insertAdjacentHTML("beforeend",bubble(m));l.scrollTop=l.scrollHeight}
 function showReply(){const r=$("#rb");if(!r)return;r.hidden=!replyTo;if(replyTo){r.innerHTML=`↩ ${esc(qText(replyTo))} <button class="t" id="xr">✕</button>`;$("#xr").onclick=()=>{replyTo=null;showReply()}}}
 function viewer(u,note){const d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:20;background:rgba(40,20,40,.92);display:grid;place-items:center;padding:16px;color:#fff;text-align:center";
@@ -129,9 +135,9 @@ async function chatView(){
 cur=[];replyTo=null;
 A.innerHTML=`<div class="top g" style="margin:8px 10px"><button class="t" id="bk">←</button>${av(peer)}<b>${esc(peer.display_name)}</b></div><div class="msgs" id="ml"><p class="mut" style="text-align:center">Loading…</p></div><div class="g emo" id="em" hidden>${EMOJI.map(e=>`<span>${e}</span>`).join("")}</div>
 <div class="g" id="rb" hidden style="margin:0 10px 6px;padding:6px 12px;font-size:13px"></div>
-<form class="g bar" id="f"><button type="button" class="s" id="eb" aria-label="Emoji">😊</button><button type="button" class="s" id="pb" aria-label="Photo">📷</button><button type="button" class="s" id="ob" aria-label="View once photo">🔥</button><input id="mi" placeholder="Message…" autocomplete="off" maxlength="2000"><button type="button" id="mb" aria-label="Voice note">🎤</button><button aria-label="Send">➤</button></form><input type="file" id="pf1" accept="image/jpeg,image/png,image/webp" hidden>`;
-$("#bk").onclick=()=>{if(rec)rec.stop();peer=null;render()};$("#eb").onclick=()=>{$("#em").hidden=!$("#em").hidden};
-$("#em").onclick=e=>{if(e.target.tagName==="SPAN"){$("#mi").value+=e.target.textContent;$("#mi").focus()}};
+<form class="g bar" id="f"><button type="button" class="ic" id="pl" aria-label="More"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></button><button type="button" class="ic" id="cm" aria-label="Camera"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M9 3L7.2 5H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.2L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg></button><button type="button" class="ic" id="gl" aria-label="Photos"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5 3h14a3 3 0 013 3v12a3 3 0 01-3 3H5a3 3 0 01-3-3V6a3 3 0 013-3zm3.5 4a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM4 18l4.5-5.5 3 3.5 3.5-4.5L20 18H4z"/></svg></button><button type="button" class="ic" id="mb" aria-label="Voice note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-3.08A7 7 0 0019 11h-2z"/></svg></button><div class="ib"><input id="mi" placeholder="Aa" autocomplete="off" maxlength="2000"><button type="button" class="ic" id="eb" aria-label="Emoji"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2a10 10 0 100 20 10 10 0 000-20zM8.5 8.5a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6zm7 0a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6zM7.5 14h9a4.5 4.5 0 01-9 0z"/></svg></button></div><button type="button" class="ic" id="lk" aria-label="Like"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h4V9H2v12zM22 10a2 2 0 00-2-2h-6.3l1-4.6.03-.3a1.5 1.5 0 00-.44-1.06L13.2 1 7.6 6.6A2 2 0 007 8v11a2 2 0 002 2h9a2 2 0 001.8-1.1l3-7A2 2 0 0021 12v-2z"/></svg></button><button class="ic" id="sd" aria-label="Send" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5v-6.8l11-1.7-11-1.7V3.5L22 12 3 20.5z"/></svg></button></form><input type="file" id="pf1" accept="image/jpeg,image/png,image/webp" hidden><input type="file" id="pf2" accept="image/*" capture="environment" hidden>`;
+$("#bk").onclick=()=>{if(rec)rec.stop();peer=null;render()};$("#eb").onclick=()=>{$("#em").hidden=!$("#em").hidden};const sync=()=>{const h=$("#mi").value.trim().length>0;["cm","gl","mb","lk"].forEach(i=>$("#"+i).hidden=h);$("#sd").hidden=!h};$("#mi").oninput=sync;
+$("#em").onclick=e=>{if(e.target.tagName==="SPAN"){$("#mi").value+=e.target.textContent;sync();$("#mi").focus()}};
 const p=peer.id,m=me.id;
 const{data,error}=await sb.from("messages").select("*").or(`and(sender.eq.${m},recipient.eq.${p}),and(sender.eq.${p},recipient.eq.${m})`).order("created_at").limit(300);
 const l=$("#ml");if(!l)return;if(error){l.innerHTML=`<div class="err">${esc(error.message)}</div>`;return}
@@ -142,18 +148,18 @@ if(error){toast("Couldn't send: "+error.message);return false}replyTo=null;showR
 async function sendMedia(blob,ext,kind,dur){toast("Sending…");const path=`${m}/${Date.now()}.${ext}`;
 const up=await sb.storage.from("chat-media").upload(path,blob,{contentType:blob.type,upsert:false});if(up.error)return toast("Upload failed: "+up.error.message);
 if(!await send({kind,media_path:path,duration:dur||null}))sb.storage.from("chat-media").remove([path])}
-$("#f").onsubmit=async e=>{e.preventDefault();const body=$("#mi").value.trim();if(!body)return;$("#mi").value="";if(!await send({body}))$("#mi").value=body};
-$("#pb").onclick=()=>{pickMode="image";$("#pf1").click()};$("#ob").onclick=()=>{pickMode="view_once";$("#pf1").click()};
+$("#f").onsubmit=async e=>{e.preventDefault();const body=$("#mi").value.trim();if(!body)return;$("#mi").value="";sync();if(!await send({body})){$("#mi").value=body;sync()}};
+$("#cm").onclick=()=>{pickMode="image";$("#pf2").click()};$("#gl").onclick=()=>{pickMode="image";$("#pf1").click()};$("#lk").onclick=()=>send({body:"👍"});$("#pl").onclick=()=>sheet([["🔥 View-once photo from gallery",()=>{pickMode="view_once";$("#pf1").click()}],["🔥 View-once photo from camera",()=>{pickMode="view_once";$("#pf2").click()}]]);
 $("#pf1").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
 if(!/^image\/(jpeg|png|webp)$/.test(f.type))return toast("Pick a JPG, PNG or WebP photo");
-try{await sendMedia(await shrink(f,1280),"jpg",pickMode)}catch(x){toast(x.message)}};
+try{await sendMedia(await shrink(f,1280),"jpg",pickMode)}catch(x){toast(x.message)}};$("#pf2").onchange=$("#pf1").onchange;
 $("#mb").onclick=async()=>{if(rec){rec.stop();return}
 try{const st=await navigator.mediaDevices.getUserMedia({audio:true});
 const mt=["audio/webm;codecs=opus","audio/mp4","audio/ogg"].find(t=>MediaRecorder.isTypeSupported(t))||"";
-const mr=new MediaRecorder(st,mt?{mimeType:mt}:{}),chunks=[],t0=Date.now();rec=mr;$("#mb").textContent="⏹";
+const mr=new MediaRecorder(st,mt?{mimeType:mt}:{}),chunks=[],t0=Date.now();rec=mr;$("#mb").classList.add("rec");
 const to=setTimeout(()=>mr.state==="recording"&&mr.stop(),120000);
 mr.ondataavailable=e=>chunks.push(e.data);
-mr.onstop=async()=>{clearTimeout(to);st.getTracks().forEach(t=>t.stop());rec=null;const b=$("#mb");if(b)b.textContent="🎤";
+mr.onstop=async()=>{clearTimeout(to);st.getTracks().forEach(t=>t.stop());rec=null;const b=$("#mb");if(b)b.classList.remove("rec");
 const type=(mr.mimeType||"audio/webm").split(";")[0],blob=new Blob(chunks,{type}),dur=Math.round((Date.now()-t0)/1000);
 if(dur<1)return toast("Too short");if(blob.size>5e6)return toast("Voice note too big");
 await sendMedia(blob,type.includes("mp4")?"m4a":type.includes("ogg")?"ogg":"webm","voice",dur)};
@@ -166,8 +172,13 @@ if(d.i){const u=await signed(d.i);if(u)viewer(u);return}
 if(d.o){const{data:path,error}=await sb.rpc("consume_view_once",{msg_id:+d.o});if(error||!path)return toast("Already opened or unavailable");
 const u=await signed(path,60);if(!u)return;viewer(u,"This photo opens only once. Screenshots can't be blocked.");
 const x=cur.find(y=>y.id==d.o);if(x)x.viewed_at=new Date().toISOString();t.outerHTML="<i>🔥 Photo opened</i>"}};
-l.addEventListener("dblclick",async e=>{const b=e.target.closest(".b.me");if(!b||!confirm("Delete this message?"))return;const x=cur.find(y=>y.id==b.dataset.id);
-const{error}=await sb.from("messages").delete().eq("id",b.dataset.id);if(!error){b.remove();if(x?.media_path)sb.storage.from("chat-media").remove([x.media_path])}})}
+let lp;l.addEventListener("pointerdown",e=>{const b=e.target.closest(".b");if(!b||e.target.closest("button"))return;
+lp=setTimeout(()=>{const x=cur.find(y=>y.id==b.dataset.id);if(!x)return;const it=[["↩ Reply",()=>{replyTo=x;showReply();$("#mi").focus()}]];
+if(x.sender===me.id)it.push(["🗑 Delete message",async()=>{const{error}=await sb.from("messages").delete().eq("id",x.id);if(!error){b.remove();if(x.media_path)sb.storage.from("chat-media").remove([x.media_path])}else toast("Couldn't delete")}]);sheet(it)},450)});
+["pointerup","pointermove","pointercancel"].forEach(t=>l.addEventListener(t,()=>clearTimeout(lp)));l.addEventListener("contextmenu",e=>e.preventDefault())}
+function sheet(items){const d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:30;background:rgba(40,20,40,.35);display:flex;align-items:flex-end;justify-content:center;padding:12px";
+d.innerHTML=`<div class="g pad" style="width:100%;max-width:480px;display:grid;gap:8px">${items.map((x,i)=>`<button class="s" data-k="${i}">${x[0]}</button>`).join("")}<button class="t" data-k="x">Cancel</button></div>`;
+d.onclick=e=>{const k=e.target.dataset.k;if(e.target===d||k==="x")return d.remove();if(k!==undefined){d.remove();items[+k][1]()}};document.body.append(d)}
 
 /* ---------- PROFILE ---------- */
 function profileTab(){const v=$("#v");
