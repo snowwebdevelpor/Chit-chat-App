@@ -1,0 +1,198 @@
+<!doctype html><html lang="en" data-theme="pink"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffd6e8"><link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><title>Chit Chat</title>
+<style>
+@font-face{font-family:ChitEmoji;src:url(emoji.ttf) format("truetype");font-display:swap;
+unicode-range:U+2190-21FF,U+2300-23FF,U+2460-24FF,U+25A0-27BF,U+2900-297F,U+2B00-2BFF,U+3030,U+303D,U+3297,U+3299,U+1F000-1FAFF,U+200D,U+20E3,U+FE0F}
+:root{--a:#ff8fb8;--a2:#c9b6ff;--bg1:#ffe3ef;--bg2:#f1e8ff;--ink:#3a2236;--mut:#7d5f75;--glass:rgba(255,255,255,.88);--bd:rgba(255,255,255,.9);--glow:rgba(255,143,184,.4)}
+[data-theme=green]{--a:#ff9cc2;--a2:#a8e6c3;--bg1:#ffeaf2;--bg2:#e4f8ec;--glow:rgba(120,220,170,.4)}
+@supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){:root{--glass:rgba(255,255,255,.55)}.g{-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
+body{font-family:ChitEmoji,ui-rounded,"SF Pro Rounded",system-ui,Roboto,sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 8%,var(--glow),transparent 45%),radial-gradient(circle at 92% 92%,var(--a2),transparent 50%),linear-gradient(160deg,var(--bg1),var(--bg2));background-attachment:fixed}
+#app{max-width:520px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.g{background:var(--glass);border:1px solid var(--bd);border-radius:22px;box-shadow:0 8px 28px var(--glow)}
+.pad{padding:16px}.main{flex:1;overflow:auto;padding:14px}.row{display:flex;align-items:center;gap:12px}.sp{flex:1}
+h1{margin:0 0 12px;font-size:26px}h2{font-size:17px;margin:18px 4px 8px}small,.mut{color:var(--mut)}
+input,textarea,select{width:100%;padding:13px 14px;margin:5px 0;border-radius:16px;border:1px solid var(--bd);background:rgba(255,255,255,.75);font:inherit;color:var(--ink);outline:none}
+input:focus,textarea:focus{box-shadow:0 0 0 3px var(--glow)}
+button{font:inherit;border:0;border-radius:16px;padding:12px 16px;min-height:44px;color:#fff;background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 4px 14px var(--glow);transition:transform .15s}
+button:active{transform:scale(.96)}button.s{background:rgba(255,255,255,.8);color:var(--ink);box-shadow:none}button.t{background:none;color:var(--mut);box-shadow:none;padding:8px}
+.av{width:46px;height:46px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--a),var(--a2));display:grid;place-items:center;color:#fff;font-weight:700;flex:none;overflow:hidden}
+.av.l{width:96px;height:96px;font-size:34px;margin:0 auto}
+.item{margin:8px 0;padding:12px}
+nav{display:flex;margin:8px 12px calc(10px + env(safe-area-inset-bottom));padding:6px}nav button{flex:1;background:none;color:var(--mut);box-shadow:none;font-size:13px}nav button.on{color:#fff;background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 4px 14px var(--glow)}
+.msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
+.b{max-width:78%;padding:9px 13px;border-radius:20px;word-wrap:break-word;white-space:pre-wrap;background:var(--glass);border:1px solid var(--bd)}
+.b.me{align-self:flex-end;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border:0}.b small{display:block;font-size:11px;opacity:.75;margin-top:2px}.b.me small{color:#fff}
+.bar{display:flex;gap:8px;padding:10px;margin:0 10px calc(10px + env(safe-area-inset-bottom))}.bar input{margin:0}
+.emo{display:flex;flex-wrap:wrap;gap:2px;padding:8px;margin:0 10px 6px}.emo span{font-size:26px;padding:4px;cursor:pointer}
+.err{color:#b3264e;font-size:14px;margin:6px 0;min-height:18px}.ok{color:#2c7a55}
+.q{font-size:12px;opacity:.8;border-left:3px solid var(--a2);padding-left:6px;margin-bottom:4px}.b button{padding:8px 12px;min-height:36px}.bar button{padding:10px 11px}.bar input{flex:1;min-width:0}.top{display:flex;align-items:center;gap:10px;padding:8px 12px}
+</style></head><body><div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* ====== PASTE YOUR SUPABASE VALUES HERE (the anon/publishable key is safe to expose; NEVER paste service_role) ====== */
+const SUPABASE_URL="https://lgwejbfaxhpqglynyvgq.supabase.co",SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxnd2VqYmZheGhwcWdseW55dmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwMDU3NzAsImV4cCI6MjEwODU4MTc3MH0.VY5ps4eklJphp_hPaOQY_Lehs9bEbhKXTsqe1EDRExY";
+/* ================================================================================================================ */
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const $=s=>document.querySelector(s),A=$("#app");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const EMOJI="😀 😂 🥰 😍 😘 😭 😊 🥺 😎 🤗 😴 🤔 👍 🙏 👏 🎉 💗 💖 💕 💜 💚 🌸 ✨ 🔥 🎀 🧸 🍓 🌷".split(" ");
+let me=null,prof=null,tab="chats",peer=null,mode="login",recovery=false,ch=null,emo=false;
+const theme=localStorage.getItem("cc-theme")||"pink";document.documentElement.dataset.theme=theme;
+const av=(p,c="")=>p?.avatar_url?`<img class="av ${c}" src="${esc(p.avatar_url)}" alt="">`:`<div class="av ${c}">${esc((p?.display_name||p?.username||"?")[0]?.toUpperCase())}</div>`;
+const time=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+function msg(id,t,ok){const e=$("#"+id);if(e){e.textContent=t;e.className="err"+(ok?" ok":"")}}
+
+/* ---------- AUTH ---------- */
+function authView(){
+if(recovery)return A.innerHTML=`<div class="main"><div class="g pad"><h1>New password 💗</h1><input id="p1" type="password" placeholder="New password (8+ characters)"><div id="e" class="err"></div><button id="go" style="width:100%">Save password</button></div></div>`,
+$("#go").onclick=async()=>{const p=$("#p1").value;if(p.length<8)return msg("e","Use at least 8 characters.");const{error}=await sb.auth.updateUser({password:p});if(error)return msg("e",error.message);recovery=false;boot()};
+const su=mode==="signup",rs=mode==="reset";
+A.innerHTML=`<div class="main" style="display:grid;align-content:center"><div class="g pad"><h1>Chit Chat 💗</h1><p class="mut" style="margin-top:-6px">${rs?"We'll email you a reset link.":su?"Create your account":"Welcome back"}</p>
+${su?`<input id="un" placeholder="Unique username (a-z, 0-9, _)" autocapitalize="none"><input id="dn" placeholder="Display name">`:""}
+<input id="em" type="email" placeholder="Email" autocomplete="email">${rs?"":`<input id="pw" type="password" placeholder="Password (8+ characters)" autocomplete="${su?"new":"current"}-password">`}
+<div id="e" class="err"></div><button id="go" style="width:100%">${rs?"Send reset link":su?"Sign up":"Log in"}</button>
+<div class="row" style="justify-content:center;margin-top:8px">${rs?`<button class="t" data-m="login">Back to login</button>`:`<button class="t" data-m="${su?"login":"signup"}">${su?"I have an account":"Create account"}</button>${su?"":`<button class="t" data-m="reset">Forgot password?</button>`}`}</div></div></div>`;
+A.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=b.dataset.m;authView()});
+$("#go").onclick=async()=>{const email=$("#em").value.trim(),pw=$("#pw")?.value;msg("e","");
+if(!/^\S+@\S+\.\S+$/.test(email))return msg("e","Enter a valid email.");
+if(rs){const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});return error?msg("e",error.message):msg("e","Check your email for the link 💌",1)}
+if(pw.length<8)return msg("e","Password must be at least 8 characters.");
+if(su){const username=$("#un").value.trim().toLowerCase(),dn=$("#dn").value.trim();
+if(!/^[a-z0-9_]{3,20}$/.test(username))return msg("e","Username: 3-20 letters, numbers or _.");
+const{data,error}=await sb.auth.signUp({email,password:pw,options:{data:{username,display_name:dn||username}}});
+if(error)return msg("e",/database error|unique|duplicate/i.test(error.message)?"That username is taken, try another.":error.message);
+if(!data.session)msg("e","Almost there! Confirm your email, then log in 💌",1)}
+else{const{error}=await sb.auth.signInWithPassword({email,password:pw});if(error)msg("e",error.message)}}}
+
+/* ---------- DATA ---------- */
+async function loadFriends(){const{data:fr,error}=await sb.from("friendships").select("*");if(error)throw error;
+const ids=[...new Set((fr||[]).flatMap(f=>[f.requester,f.addressee]))].filter(i=>i!==me.id);
+let pm={};if(ids.length){const{data}=await sb.from("profiles").select("*").in("id",ids);(data||[]).forEach(p=>pm[p.id]=p)}
+return(fr||[]).map(f=>({...f,other:pm[f.requester===me.id?f.addressee:f.requester]}))}
+
+/* ---------- APP SHELL ---------- */
+async function boot(){
+const{data}=await sb.auth.getSession();me=data.session?.user||null;
+if(!me)return authView();
+const{data:p}=await sb.from("profiles").select("*").eq("id",me.id).single();prof=p;
+if(ch)sb.removeChannel(ch);
+ch=sb.channel("inbox-"+me.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:`recipient=eq.${me.id}`},async e=>{
+if(peer&&e.new.sender===peer.id){addBubble(e.new);sb.rpc("mark_read",{other:peer.id})}else{toast("New message 💌")}})
+.on("postgres_changes",{event:"*",schema:"public",table:"friendships"},()=>{if(!peer&&tab!=="profile")render()}).subscribe();
+render()}
+function toast(t){const d=document.createElement("div");d.className="g pad";d.style.cssText="position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9";d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),2500)}
+function render(){if(!me)return authView();if(peer)return chatView();
+A.innerHTML=`<div class="main" id="v"></div><nav class="g">${[["chats","💬 Chats"],["friends","👭 Friends"],["profile","🌸 Me"]].map(([k,l])=>`<button data-t="${k}" class="${tab===k?"on":""}">${l}</button>`).join("")}</nav>`;
+A.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});({chats:chatsTab,friends:friendsTab,profile:profileTab})[tab]()}
+
+async function chatsTab(){const v=$("#v");v.innerHTML=`<h1>Chats 💬</h1><p class="mut">Loading…</p>`;
+try{const fs=(await loadFriends()).filter(f=>f.status==="accepted"&&f.other);
+v.innerHTML=`<h1>Chats 💬</h1>`+(fs.length?fs.map(f=>`<div class="g item row" data-id="${f.other.id}">${av(f.other)}<div><b>${esc(f.other.display_name)}</b><br><small>@${esc(f.other.username)}</small></div></div>`).join(""):`<div class="g pad mut">No chats yet. Add a friend in the Friends tab and they'll show up here ✨</div>`);
+v.querySelectorAll("[data-id]").forEach(e=>e.onclick=()=>{peer=fs.find(f=>f.other.id===e.dataset.id).other;render()})}catch(e){v.innerHTML=`<div class="err">Couldn't load: ${esc(e.message)}</div>`}}
+
+async function friendsTab(){const v=$("#v");
+v.innerHTML=`<h1>Friends 👭</h1><div class="g pad"><div class="row"><input id="q" placeholder="Search exact username" autocapitalize="none"><button id="sq">Go</button></div><div id="sr"></div></div><div id="fl"><p class="mut">Loading…</p></div>`;
+$("#sq").onclick=async()=>{const q=$("#q").value.trim().toLowerCase().replace(/^@/,"");if(!q)return;
+const{data}=await sb.from("profiles").select("*").ilike("username",q+"%").neq("id",me.id).limit(8);
+$("#sr").innerHTML=(data||[]).map(p=>`<div class="row item">${av(p)}<div class="sp"><b>${esc(p.display_name)}</b><br><small>@${esc(p.username)}</small></div><button data-add="${p.id}">Add</button></div>`).join("")||`<p class="mut">No one found.</p>`;
+$("#sr").querySelectorAll("[data-add]").forEach(b=>b.onclick=async()=>{const{error}=await sb.from("friendships").insert({requester:me.id,addressee:b.dataset.add});b.textContent=error?(error.code==="23505"?"Already sent":"Error"):"Sent ✓";b.disabled=true;if(!error)friendsList()})};
+$("#q").onkeydown=e=>{if(e.key==="Enter")$("#sq").click()};friendsList()}
+async function friendsList(){const el=$("#fl");if(!el)return;
+try{const fs=await loadFriends(),inc=fs.filter(f=>f.status==="pending"&&f.addressee===me.id&&f.other),out=fs.filter(f=>f.status==="pending"&&f.requester===me.id&&f.other),ok=fs.filter(f=>f.status==="accepted"&&f.other);
+const row=(f,btns)=>`<div class="g item row">${av(f.other)}<div class="sp"><b>${esc(f.other.display_name)}</b><br><small>@${esc(f.other.username)}</small></div>${btns}</div>`;
+el.innerHTML=`<h2>Requests (${inc.length})</h2>`+(inc.map(f=>row(f,`<button data-acc="${f.id}">Accept</button><button class="s" data-del="${f.id}">✕</button>`)).join("")||`<p class="mut">None right now.</p>`)
++(out.length?`<h2>Sent</h2>`+out.map(f=>row(f,`<button class="s" data-del="${f.id}">Cancel</button>`)).join(""):"")
++`<h2>Friends (${ok.length})</h2>`+(ok.map(f=>row(f,`<button class="s" data-del="${f.id}">Remove</button>`)).join("")||`<p class="mut">Nobody yet.</p>`);
+el.querySelectorAll("[data-acc]").forEach(b=>b.onclick=async()=>{await sb.from("friendships").update({status:"accepted"}).eq("id",b.dataset.acc);friendsList()});
+el.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{if(confirm("Are you sure?")){await sb.from("friendships").delete().eq("id",b.dataset.del);friendsList()}})}catch(e){el.innerHTML=`<div class="err">${esc(e.message)}</div>`}}
+
+/* ---------- CHAT ---------- */
+let cur=[],replyTo=null,rec=null,pickMode="image";
+const fmt=s=>Math.floor(s/60)+":"+String(Math.round(s%60)).padStart(2,"0");
+const qText=m=>m.kind==="text"?m.body.slice(0,60):m.kind==="voice"?"🎤 Voice message":"📷 Photo";
+const signed=async(p,sec=300)=>{const{data,error}=await sb.storage.from("chat-media").createSignedUrl(p,sec);if(error){toast("Couldn't load media");return null}return data.signedUrl};
+function bubble(m){const mine=m.sender===me.id;let inner;
+if(m.kind==="voice")inner=`<button class="s" data-v="${esc(m.media_path)}">▶ Voice ${fmt(m.duration||0)}</button>`;
+else if(m.kind==="image")inner=`<button class="s" data-i="${esc(m.media_path)}">📷 Tap to view photo</button>`;
+else if(m.kind==="view_once")inner=m.viewed_at?`<i>🔥 Photo opened</i>`:mine?`<i>🔥 View-once photo sent</i>`:`<button class="s" data-o="${m.id}">🔥 View once photo</button>`;
+else inner=esc(m.body);
+const q=m.reply_to&&cur.find(x=>x.id===m.reply_to);
+return`<div class="b ${mine?"me":""}" data-id="${m.id}">${q?`<div class="q">${esc(qText(q))}</div>`:""}${inner}<small>${time(m.created_at)}${mine?(m.read_at?" · Read":" · Sent"):""} <span data-r="${m.id}" style="cursor:pointer">↩</span></small></div>`}
+function addBubble(m){cur.push(m);const l=$("#ml");if(!l)return;const p=l.querySelector("p");if(p)p.remove();l.insertAdjacentHTML("beforeend",bubble(m));l.scrollTop=l.scrollHeight}
+function showReply(){const r=$("#rb");if(!r)return;r.hidden=!replyTo;if(replyTo){r.innerHTML=`↩ ${esc(qText(replyTo))} <button class="t" id="xr">✕</button>`;$("#xr").onclick=()=>{replyTo=null;showReply()}}}
+function viewer(u,note){const d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:20;background:rgba(40,20,40,.92);display:grid;place-items:center;padding:16px;color:#fff;text-align:center";
+d.innerHTML=`<img alt="" style="max-width:100%;max-height:75vh;border-radius:18px"><div><small style="color:#fff">${note||""}</small><br><button class="s">Close</button></div>`;d.querySelector("img").src=u;d.querySelector("button").onclick=()=>d.remove();document.body.append(d)}
+async function chatView(){
+cur=[];replyTo=null;
+A.innerHTML=`<div class="top g" style="margin:8px 10px"><button class="t" id="bk">←</button>${av(peer)}<b>${esc(peer.display_name)}</b></div><div class="msgs" id="ml"><p class="mut" style="text-align:center">Loading…</p></div><div class="g emo" id="em" hidden>${EMOJI.map(e=>`<span>${e}</span>`).join("")}</div>
+<div class="g" id="rb" hidden style="margin:0 10px 6px;padding:6px 12px;font-size:13px"></div>
+<form class="g bar" id="f"><button type="button" class="s" id="eb" aria-label="Emoji">😊</button><button type="button" class="s" id="pb" aria-label="Photo">📷</button><button type="button" class="s" id="ob" aria-label="View once photo">🔥</button><input id="mi" placeholder="Message…" autocomplete="off" maxlength="2000"><button type="button" id="mb" aria-label="Voice note">🎤</button><button aria-label="Send">➤</button></form><input type="file" id="pf1" accept="image/jpeg,image/png,image/webp" hidden>`;
+$("#bk").onclick=()=>{if(rec)rec.stop();peer=null;render()};$("#eb").onclick=()=>{$("#em").hidden=!$("#em").hidden};
+$("#em").onclick=e=>{if(e.target.tagName==="SPAN"){$("#mi").value+=e.target.textContent;$("#mi").focus()}};
+const p=peer.id,m=me.id;
+const{data,error}=await sb.from("messages").select("*").or(`and(sender.eq.${m},recipient.eq.${p}),and(sender.eq.${p},recipient.eq.${m})`).order("created_at").limit(300);
+const l=$("#ml");if(!l)return;if(error){l.innerHTML=`<div class="err">${esc(error.message)}</div>`;return}
+cur=data;l.innerHTML=data.length?data.map(bubble).join(""):`<p class="mut" style="text-align:center;margin:auto">Say hi to ${esc(peer.display_name)} 👋</p>`;l.scrollTop=l.scrollHeight;
+sb.rpc("mark_read",{other:p});
+async function send(extra){const{data:r,error}=await sb.from("messages").insert({sender:m,recipient:p,body:"",kind:"text",reply_to:replyTo?.id||null,...extra}).select().single();
+if(error){toast("Couldn't send: "+error.message);return false}replyTo=null;showReply();addBubble(r);return true}
+async function sendMedia(blob,ext,kind,dur){toast("Sending…");const path=`${m}/${Date.now()}.${ext}`;
+const up=await sb.storage.from("chat-media").upload(path,blob,{contentType:blob.type,upsert:false});if(up.error)return toast("Upload failed: "+up.error.message);
+if(!await send({kind,media_path:path,duration:dur||null}))sb.storage.from("chat-media").remove([path])}
+$("#f").onsubmit=async e=>{e.preventDefault();const body=$("#mi").value.trim();if(!body)return;$("#mi").value="";if(!await send({body}))$("#mi").value=body};
+$("#pb").onclick=()=>{pickMode="image";$("#pf1").click()};$("#ob").onclick=()=>{pickMode="view_once";$("#pf1").click()};
+$("#pf1").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+if(!/^image\/(jpeg|png|webp)$/.test(f.type))return toast("Pick a JPG, PNG or WebP photo");
+try{await sendMedia(await shrink(f,1280),"jpg",pickMode)}catch(x){toast(x.message)}};
+$("#mb").onclick=async()=>{if(rec){rec.stop();return}
+try{const st=await navigator.mediaDevices.getUserMedia({audio:true});
+const mt=["audio/webm;codecs=opus","audio/mp4","audio/ogg"].find(t=>MediaRecorder.isTypeSupported(t))||"";
+const mr=new MediaRecorder(st,mt?{mimeType:mt}:{}),chunks=[],t0=Date.now();rec=mr;$("#mb").textContent="⏹";
+const to=setTimeout(()=>mr.state==="recording"&&mr.stop(),120000);
+mr.ondataavailable=e=>chunks.push(e.data);
+mr.onstop=async()=>{clearTimeout(to);st.getTracks().forEach(t=>t.stop());rec=null;const b=$("#mb");if(b)b.textContent="🎤";
+const type=(mr.mimeType||"audio/webm").split(";")[0],blob=new Blob(chunks,{type}),dur=Math.round((Date.now()-t0)/1000);
+if(dur<1)return toast("Too short");if(blob.size>5e6)return toast("Voice note too big");
+await sendMedia(blob,type.includes("mp4")?"m4a":type.includes("ogg")?"ogg":"webm","voice",dur)};
+mr.start()}catch(x){toast("Allow microphone access to record")}};
+l.onclick=async e=>{const t=e.target.closest("[data-v],[data-i],[data-o],[data-r]");if(!t)return;const d=t.dataset;
+if(d.r){replyTo=cur.find(x=>x.id==d.r);showReply();$("#mi").focus();return}
+if(d.v){if(t._a){if(t._a.paused){t._a.play();t.textContent="⏸ Pause"}else{t._a.pause();t.textContent="▶ Resume"}return}
+const u=await signed(d.v);if(!u)return;const a=t._a=new Audio(u);a.onended=()=>{t.textContent="▶ Play again";t._a=null};a.play().then(()=>t.textContent="⏸ Pause").catch(()=>toast("Couldn't play"));return}
+if(d.i){const u=await signed(d.i);if(u)viewer(u);return}
+if(d.o){const{data:path,error}=await sb.rpc("consume_view_once",{msg_id:+d.o});if(error||!path)return toast("Already opened or unavailable");
+const u=await signed(path,60);if(!u)return;viewer(u,"This photo opens only once. Screenshots can't be blocked.");
+const x=cur.find(y=>y.id==d.o);if(x)x.viewed_at=new Date().toISOString();t.outerHTML="<i>🔥 Photo opened</i>"}};
+l.addEventListener("dblclick",async e=>{const b=e.target.closest(".b.me");if(!b||!confirm("Delete this message?"))return;const x=cur.find(y=>y.id==b.dataset.id);
+const{error}=await sb.from("messages").delete().eq("id",b.dataset.id);if(!error){b.remove();if(x?.media_path)sb.storage.from("chat-media").remove([x.media_path])}})}
+
+/* ---------- PROFILE ---------- */
+function profileTab(){const v=$("#v");
+v.innerHTML=`<div class="g pad" style="text-align:center"><div id="pa">${av(prof,"l")}</div><p><b>@${esc(prof.username)}</b><br><small>${esc(me.email)}</small></p>
+<input type="file" id="pf" accept="image/jpeg,image/png,image/webp" hidden><button class="s" id="pc">Choose photo</button><div id="pe" class="err"></div></div>
+<div class="g pad" style="margin-top:12px"><small>Display name</small><input id="dn" maxlength="40" value="${esc(prof.display_name)}"><small>Bio</small><textarea id="bio" rows="3" maxlength="200">${esc(prof.bio)}</textarea><div id="se" class="err"></div><button id="sv" style="width:100%">Save profile</button></div>
+<div class="g pad" style="margin-top:12px"><small>Theme</small><select id="th"><option value="pink">Pink &amp; White</option><option value="green">Pink &amp; Green</option></select></div>
+<button class="s" id="lo" style="width:100%;margin-top:12px">Log out</button><p class="mut" style="text-align:center;font-size:12px">Not end-to-end encrypted: messages are protected in transit and by access rules, but the server can read them.</p>`;
+$("#th").value=document.documentElement.dataset.theme;$("#th").onchange=e=>{document.documentElement.dataset.theme=e.target.value;localStorage.setItem("cc-theme",e.target.value)};
+$("#lo").onclick=async()=>{await sb.auth.signOut();prof=null;peer=null;authView()};
+$("#sv").onclick=async()=>{const{error}=await sb.from("profiles").update({display_name:$("#dn").value.trim()||prof.username,bio:$("#bio").value.trim()}).eq("id",me.id);
+if(error)return msg("se",error.message);prof.display_name=$("#dn").value.trim()||prof.username;msg("se","Saved ✓",1)};
+$("#pc").onclick=()=>$("#pf").click();
+$("#pf").onchange=async e=>{const f=e.target.files[0];if(!f)return;msg("pe","");
+if(!/^image\/(jpeg|png|webp)$/.test(f.type))return msg("pe","Please pick a JPG, PNG or WebP photo.");
+try{msg("pe","Preparing photo…",1);const blob=await shrink(f);$("#pa").innerHTML=`<img class="av l" src="${URL.createObjectURL(blob)}">`;
+msg("pe","Uploading…",1);const path=`${me.id}/avatar.jpg`;
+const up=await sb.storage.from("avatars").upload(path,blob,{upsert:true,contentType:"image/jpeg",cacheControl:"3600"});if(up.error)throw new Error("Upload failed: "+up.error.message);
+const url=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl+"?v="+Date.now();
+const{error}=await sb.from("profiles").update({avatar_url:url}).eq("id",me.id);if(error)throw new Error("Saved the file but not the profile: "+error.message);
+prof.avatar_url=url;$("#pa").innerHTML=av(prof,"l");msg("pe","Photo saved ✓",1)}catch(x){msg("pe",x.message)}};}
+function shrink(file,max=512){return new Promise((res,rej)=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const s=Math.min(1,max/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);c.getContext("2d").drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?res(b):rej(new Error("Couldn't process that image.")),"image/jpeg",.85)};i.onerror=()=>rej(new Error("Couldn't read that image."));i.src=u})}
+
+/* ---------- START ---------- */
+sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY"){recovery=true;authView()}else if((ev==="SIGNED_IN"&&!recovery&&!prof)||ev==="SIGNED_OUT")setTimeout(boot,0)});
+if(SUPABASE_URL.startsWith("PASTE"))A.innerHTML=`<div class="main"><div class="g pad"><h1>Almost ready 💗</h1><p>Open <b>index.html</b> and paste your Supabase URL and anon key near the top. See README.md.</p></div></div>`;else boot();
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script></body></html>
